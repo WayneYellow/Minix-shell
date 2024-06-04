@@ -1,0 +1,104 @@
+1)Overview
+a shell that support argument, background excecution, file redirection, pipe, etc.
+- interpret input
+    get user input and identify the sqecial tokens such as '&', '>', '<' and '|'.
+    use getline() and strtok() to read and break down the input string
+
+- fork
+    forking a child process which is a copy of the parent process. The function `fork()` return process ID (PID) of the the child process, and it runs independently of the parent process.
+    With child process, we can do things like parallel execution, and isolate the fault with each process, if something went wrong in one process, it typically does not affect other processes.
+
+- execvp 
+    use `execvp()` to execute external programs and commands. it searches for the command executable within the directories listed in the PATH environment variable and replaces the current process image with a new process image specified by the provided command.
+    It takes two parameter, first is the command, or a program name, and the second is the parameter list.
+    The function will return a value if an error happand during execute such as command not found, invalid argument, file system error, etc. Otherwise, it won't return any thing.
+    use execvp() instead of execv() because execvp() sees the command as a program name if it does not contain '/'. The other only accept absolute path and relative path.
+
+- file access
+    Provide a proper file operation for redirection, make sure the file is opened and closed correctly.
+    use `open()`/`close()`system call to handle.
+
+- The `cd` command
+    provide the shell to be able to change the the current directory .
+    `cd` needs to be implemented as an internal command within the shell. It cannot be done in a child process because it doesn't affect the parent process
+    use `chdir()` to change directory.
+
+- waitpid/exit
+    wait for the child process to complete, or terminate the current process, typically with a specified exit status.
+
+- file redirection
+    use `dup2()` for duplicating file descriptors.
+
+
+2)In-depth Analysis and Implementation
+
+1. Functions to be Implemented:
+`loop()`: The main loop function that continuously prompts for user input and executes commands.
+
+`read_line()`: Reads a line of input from the standard input (stdin).
+
+`split_line()`: Splits the input line into tokens, handling background indicators, input/output redirection, and regular tokens.
+
+`execute()`: Executes commands with or without arguments, handles background execution, input/output redirection, and file pipelines.
+
+2. Existing Functions to be Modified:
+None
+
+3. Corner Cases and Error Conditions:
+
+- Empty commands
+- fork error:
+    1. Insufficient resources to create a new process (e.g., system-wide process limit reached).
+    2. Permission denied
+
+- execvp error:
+    1. Command not found (executable file does not exist or is not in the PATH).
+    2. Permission denied (user lacks execute permissions for the command).
+    3. Insufficient memory to execute the command.
+    4. Invalid arguments passed to execvp (e.g., NULL command name).
+    5. File system errors (e.g., disk full, read/write errors).
+
+- open (for input/output redirection) error:
+    1. File does not exist (when opening for reading).
+    2. Permission denied.
+    3. File path is a directory, not a regular file (when opening for writing).
+    4. Insufficient file system space.
+    5. File descriptor limit reached.
+
+- waitpid :
+    1. Invalid process ID or options.
+    2. No child processes exist.
+    3. Interrupted by a signal handler.
+
+4. Test plan
+
+1. Test that all targets are functioning properly
+2. Test all the error condition list above
+
+some test case:
+ls
+clear
+ls -l
+cd /root
+cd ..
+ls -l &
+ls -l > foo
+sort < foo
+ls -l | more
+poweroff
+(empty)
+ls fkodkf
+cd kdfospfk
+
+3) Risks
+1. Potential Risks:
+- multiple pipelines has high complexity and may lead to error.
+- Memory management issues such as memory leaks or invalid memory accesses.(mostly solved)
+
+2. Time Estimates:
+Best Case: 2-3 days
+
+Worst Case: 1-2 weeks
+
+Average Case: 1 week
+

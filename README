@@ -1,10 +1,16 @@
-1. The program first enters a loop to perform 'input reading' and splits the command by ' ' (space).
-2. Enters the read() function to check if it's EOF, if so, exits the loop().
-3. Splits and categorizes the command.
-4. Enters execute() and performs:
-   (1) Checks if the command is empty, if so, returns to loop().
-   (2) Checks if the command is "cd".
-   (3) Checks if the command is "exit", then exits the loop().
-   (4) Creates a child process and lets the parent wait for the child process to end (to avoid zombie processes).
-   (5) Checks if the command includes instructions for output, input, piping, etc., and executes them accordingly.
-After performing the above checks, returns to loop().
+1)Build: using "clang shell.c -o shell" to compile
+2)run: "./shell"
+3)features: my program implements all the requirements in the assignment's details from 1~7 and the 'cd' command.
+4)notice: pipe only support single pipe. It cannot support multiple pipes or a combination of pipes and redirection in one command.
+5)testing: 
+you can see '>> ' if my shell is running, type any commands you want. and here is some example:
+'ls'
+'clear'
+'ls -l'
+'cd /root'
+'cd ..'
+'ls -l &'
+'ls -l > foo'
+'sort < foo'
+'ls -l | more'
+'poweroff'
